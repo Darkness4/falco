@@ -21,7 +21,7 @@ on:
         type: boolean
         default: false
 
-permissions:  
+permissions:
   contents: read
 
 jobs:
@@ -73,6 +73,8 @@ jobs:
       - name: Install zig
         if: inputs.sanitizers == false
         uses: falcosecurity/libs/.github/actions/install-zig@master
+        with:
+          ZIG_VERSION: '0.14.0-dev.3091+42e48b83b'
 
       - name: Prepare project
         run: |
@@ -145,6 +147,8 @@ jobs:
       - name: Install zig
         if: inputs.sanitizers == false
         uses: falcosecurity/libs/.github/actions/install-zig@master
+        with:
+          ZIG_VERSION: '0.14.0-dev.3091+42e48b83b'
 
       - name: Prepare project
         run: |
