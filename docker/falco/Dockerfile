@@ -1,3 +1,12 @@
+FROM busybox AS extract-falco
+
+WORKDIR /out
+
+ARG TARGETARCH
+COPY falco-0.0.0-${TARGETARCH}.tar.gz /
+
+RUN tar -xvf /falco-0.0.0-${TARGETARCH}.tar.gz --strip-components=1 -C /out && rm -rf /out/usr/src/falco-*
+
 FROM cgr.dev/chainguard/wolfi-base
 
 LABEL maintainer="cncf-falco-dev@lists.cncf.io"
@@ -18,15 +27,7 @@ RUN apk update && apk add curl ca-certificates jq libstdc++
 
 WORKDIR /
 
-RUN FALCO_VERSION_URLENCODED=$(echo -n ${FALCO_VERSION}|jq -sRr @uri) && \
-    curl -L -o falco.tar.gz \
-    https://download.falco.org/packages/${VERSION_BUCKET}/$(uname -m)/falco-${FALCO_VERSION_URLENCODED}-$(uname -m).tar.gz && \
-    tar -xvf falco.tar.gz && \
-    rm -f falco.tar.gz && \
-    mv falco-${FALCO_VERSION}-$(uname -m) falco && \
-    rm -rf /falco/usr/src/falco-* && \
-    cp -r /falco/* / && \
-    rm -rf /falco
+COPY --from=extract-falco /out /
 
 RUN sed -i -e 's/time_format_iso_8601: false/time_format_iso_8601: true/' /etc/falco/falco.yaml
 
